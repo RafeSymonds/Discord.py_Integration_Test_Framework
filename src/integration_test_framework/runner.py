@@ -110,6 +110,10 @@ async def run_integration_tests(
         await ctx.send(message)
 
 
+async def should_overwrite_bot(status: bool):
+    __test_info.overwrite_user(status)
+
+
 async def process_bot_command(message: discord.Message) -> None:
     # TODO: upadate doc string
     """Process bot commands from on_message client event."""
