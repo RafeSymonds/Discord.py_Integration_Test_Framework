@@ -4,10 +4,6 @@ import integration_test_framework.runner as runner
 import discord
 
 
-async def on_message(message: discord.Message):
-    await runner.process_bot_command(message)
-
-
 async def main():
     # Run bot - loops forever
     await discord_interface.client.start(discord_interface.BOT_TOKEN)
@@ -15,7 +11,3 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
-
-
-def on_message(message):
-    runner.process_bot_command(message)

@@ -3,6 +3,22 @@ from datetime import timedelta
 import discord
 
 
+def display_time_delta(time: timedelta) -> str:
+    milliseconds = time.microseconds // 1000
+    seconds = time.seconds % 60
+    minutes = time.seconds // 60
+
+    formatted_time = ""
+
+    if minutes > 1:
+        formatted_time += f"{minutes} minutes "
+    elif minutes == 1:
+        formatted_time += f"{minutes} minute "
+    formatted_time += f"{seconds}.{milliseconds} seconds"
+
+    return formatted_time
+
+
 def __display_time_delta(time: timedelta) -> str:
     milliseconds = time.microseconds // 1000
     seconds = time.seconds % 60
@@ -38,9 +54,9 @@ class IntegrationTestResult:
     def display_result(self) -> str:
         """Return test results as a formateted string."""
         if self.passed:
-            message = f"✅ {self.test_name} passed in {__display_time_delta(self.total_time)}\n\n"
+            message = f"✅ {self.test_name} passed in {display_time_delta(self.total_time)}\n\n"
         else:
-            message = f"❌ {self.test_name} failed in {__display_time_delta(self.total_time)}\n{self.error}\n"
+            message = f"❌ {self.test_name} failed in {display_time_delta(self.total_time)}\n{self.error}\n"
 
         return message
 

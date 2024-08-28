@@ -1,6 +1,9 @@
 import discord
 from discord.ext import commands
 import asyncio
+import pathlib
+
+from discord.webhook import async_
 import integration_test_framework.runner as runner
 
 BOT_COMAMND_PREFIX = "!"
@@ -13,11 +16,13 @@ intents.message_content = True
 intents.members = True
 client = commands.Bot(intents=intents, command_prefix=BOT_COMAMND_PREFIX)
 
-
+# Having this enabled caused problems
+"""
 @client.event
 async def on_message(message: discord.Message):
     await runner.process_bot_command(message)
     await client.process_commands(message)
+"""
 
 
 @commands.command()
@@ -25,7 +30,13 @@ async def hello(ctx: commands.Context):
     await ctx.message.channel.send(f"Hello {ctx.message.author.mention}!")
 
 
+@commands.command()
+async def run_tests(ctx: commands.Context):
+    await runner.run_integration_tests(ctx, ctx.message.author, pathlib.Path("integration_tests"))
+
+
 client.add_command(hello)
+client.add_command(run_tests)
 
 
 async def send_message(msg: str, channel: discord.channel.TextChannel | discord.channel.DMChannel) -> None:
@@ -62,7 +73,6 @@ async def wait_for_new_message_in_DM(last_message_id: int, discord_id: int, reac
 
 async def get_last_message_for_channel(channel_id) -> discord.Message | None:
     channel = client.get_channel(channel_id)
-
     if channel is None:
         channel = await client.fetch_channel(channel_id)
 
