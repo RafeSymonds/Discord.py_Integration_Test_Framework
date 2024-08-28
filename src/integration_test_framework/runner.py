@@ -1,51 +1,18 @@
+# TODO: update doc string
 """Frame work."""
 
 import pathlib
 import traceback
 from collections.abc import Callable
-from datetime import datetime, timedelta
+from datetime import datetime
 from inspect import getmembers, isfunction
 
 import discord
+import discord_interface
+import integration_test_helpers
 from discord.ext import commands
 
-
-def __display_time_delta(time: timedelta) -> str:
-    milliseconds = time.microseconds // 1000
-    seconds = time.seconds % 60
-    minutes = time.seconds // 60
-
-    formatted_time = ""
-
-    if minutes > 1:
-        formatted_time += f"{minutes} minutes "
-    elif minutes == 1:
-        formatted_time += f"{minutes} minute "
-    formatted_time += f"{seconds}.{milliseconds} seconds"
-
-    return formatted_time
-
-
-class __IntegrationTestResult:
-    def __init__(
-        self,
-        test_name: str,
-        passed: bool,
-        error: str,
-        total_time: timedelta,
-    ) -> None:
-        self.test_name = test_name
-        self.passed = passed
-        self.error = error
-        self.total_time = total_time
-
-    def display_result(self) -> str:
-        if self.passed:
-            message = f"✅ {self.test_name} passed in {__display_time_delta(self.total_time)}\n\n"
-        else:
-            message = f"❌ {self.test_name} failed in {__display_time_delta(self.total_time)}\n{self.error}\n"
-
-        return message
+__test_info: integration_test_helpers.IntegrationTestInfo = integration_test_helpers.IntegrationTestInfo(None)
 
 
 async def __process_integration_test(
@@ -53,7 +20,7 @@ async def __process_integration_test(
     test_function: Callable,
     ctx: commands.Context,
     test_num: int,
-) -> __IntegrationTestResult:
+) -> integration_test_helpers.IntegrationTestResult:
     await ctx.send(f"```Test {test_num}: {test_name}```")
 
     start_time = datetime.now()
@@ -63,7 +30,7 @@ async def __process_integration_test(
     except Exception as e:
         total_time = datetime.now() - start_time
 
-        return __IntegrationTestResult(
+        return integration_test_helpers.IntegrationTestResult(
             test_name,
             False,
             f"{e}, {type(e)}, {traceback.format_exc()}",
@@ -72,12 +39,12 @@ async def __process_integration_test(
     else:
         total_time = datetime.now() - start_time
 
-        return __IntegrationTestResult(test_name, True, "", total_time)
+        return integration_test_helpers.IntegrationTestResult(test_name, True, "", total_time)
 
 
 def test_setup(discord_user: discord.Member) -> None:
     """Run before every test."""
-    __discord_user_overwritet = discord_user
+    __test_info = integration_test_helpers.IntegrationTestInfo(discord_user)
 
 
 async def run_integration_tests(
@@ -86,7 +53,10 @@ async def run_integration_tests(
     integration_test_path: pathlib.Path,
     test_filter: str = "",
 ) -> None:
-    """Runs all integration tests that contain test_filter."""
+    # TODO: update doc string
+    """Run all integration tests that contain test_filter."""
+    test_setup(discord_user)
+
     integration_test_files = [item for item in integration_test_path.iterdir() if item.is_file()]
 
     test_num = 1
@@ -105,7 +75,7 @@ async def run_integration_tests(
             if function_name.lower().find(test_filter) == -1:
                 continue
 
-            test_result = await process_integration_test(
+            test_result = await __process_integration_test(
                 function_name,
                 function,
                 ctx,
@@ -122,7 +92,7 @@ async def run_integration_tests(
             await ctx.send(test_result.display_result())
 
     test_result_messages = [
-        f"```Testing Results: {tests_passed}/{test_num} passed in {__display_time_delta(datetime.now() - start_time)}\n",
+        f"```Testing Results: {tests_passed}/{test_num} passed in {integration_test_helpers.__display_time_delta(datetime.now() - start_time)}\n",
     ]
 
     for test_result in test_results:
@@ -138,3 +108,26 @@ async def run_integration_tests(
 
     for message in test_result_messages:
         await ctx.send(message)
+
+
+async def process_bot_command(message: discord.Message) -> None:
+    # TODO: upadate doc string
+    """Process bot commands from on_message client event."""
+    if message.author != discord_interface.client.user:
+        return
+
+    if message.content.startswith(f"{discord_interface.BOT_COMAMND_PREFIX}"):
+        return
+
+    if __test_info.discord_user_overwrite is None:
+        return
+
+    ctx = await discord_interface.client.get_context(message)
+    ctx.prefix = discord_interface.BOT_COMAMND_PREFIX
+    command_name = message.content[3:]
+    ctx.command = discord_interface.client.get_command(command_name)
+
+    ctx.message.author = __test_info.discord_user_overwrite
+    ctx.author = __test_info.discord_user_overwrite
+
+    await discord_interface.client.invoke(ctx)
