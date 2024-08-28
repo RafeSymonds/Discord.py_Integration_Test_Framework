@@ -1,6 +1,11 @@
 import asyncio
 import discord_interface
 import integration_test_framework.runner as runner
+import discord
+
+
+async def on_message(message: discord.Message):
+    await runner.process_bot_command(message)
 
 
 async def main():

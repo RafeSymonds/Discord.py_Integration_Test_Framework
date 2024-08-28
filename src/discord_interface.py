@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands
 import asyncio
+import integration_test_framework.runner as runner
 
 BOT_COMAMND_PREFIX = "!"
 RETRY_LIMIT_AMOUNT = 10
@@ -11,6 +12,11 @@ intents = discord.Intents.default()
 intents.message_content = True
 intents.members = True
 client = commands.Bot(intents=intents, command_prefix=BOT_COMAMND_PREFIX)
+
+
+@client.event
+async def on_message(message: discord.Message):
+    await runner.process_bot_command(message)
 
 
 async def send_message(msg: str, channel: discord.channel.TextChannel | discord.channel.DMChannel) -> None:
