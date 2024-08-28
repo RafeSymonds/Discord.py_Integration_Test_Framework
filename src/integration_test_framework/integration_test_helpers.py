@@ -46,11 +46,13 @@ class IntegrationTestResult:
 
 
 class IntegrationTestInfo:
-    """Global class used to store the discord_user_overwrite"""
+    """Global class used to store the discord_user_overwrite."""
 
     def __init__(self, discord_user_overwrite: discord.Member | None) -> None:
+        """Set discord_user_overwrite and defaults that bot should be overwritten."""
         self.discord_user_overwrite: discord.Member | None = discord_user_overwrite
-        self.overwrite_bot: bool = True
+        self.should_overwrite_bot: bool = True
 
-    def overwrite_user(self, status: bool):
-        self.overwrite_user = status
+    def overwrite_user(self, status: bool) -> None:
+        """Set internal overwrite bot status."""
+        self.should_overwrite_user = status
