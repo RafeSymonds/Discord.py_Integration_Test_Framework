@@ -11,7 +11,5 @@ intents.members = True
 client = commands.Bot(intents=intents, command_prefix=BOT_COMAMND_PREFIX)
 
 
-async def send_message(
-    msg: str, channel: discord.channel.TextChannel | discord.channel.DMChannel
-) -> None:
+async def send_message(msg: str, channel: discord.channel.TextChannel | discord.channel.DMChannel) -> None:
     await channel.send(msg)
