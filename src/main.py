@@ -4,10 +4,7 @@ import discord_interface
 
 async def main():
     # Run bot - loops forever
-    if globals()["RELEASE_VERSION"]:  # Run official bot
-        await discord_interface.client.start(discord_interface.BOT_COMAMND_PREFIX)
-    else:  # Run test bot
-        await discord_interface.client.start(discord_interface.BOT_COMAMND_PREFIX)
+    await discord_interface.client.start(discord_interface.BOT_TOKEN)
 
 
 if __name__ == "__main__":

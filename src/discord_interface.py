@@ -4,6 +4,7 @@ import asyncio
 
 BOT_COMAMND_PREFIX = "!"
 RETRY_LIMIT_AMOUNT = 10
+BOT_TOKEN = "MTI3ODQwNDc4NTQ2NDI4MzI5MA.GABipK.YjCrmLP49pIloEVTyg2QyrYqR9eHOeoJfOgImI"
 
 # Set up client and intents
 intents = discord.Intents.default()
