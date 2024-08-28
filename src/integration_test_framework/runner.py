@@ -76,6 +76,11 @@ async def run_integration_tests(
     ]
 
     test_num = 1
+    tests_passed = 0
+
+    start_time = datetime.now()
+
+    test_results = []
 
     for file_path in integration_test_files:
         tests = getmembers(file_path, isfunction)
@@ -90,6 +95,29 @@ async def run_integration_tests(
                 function_name, function, ctx, test_num
             )
 
-            await ctx.send(test_result.display_result())
+            test_results.append(test_results)
 
             test_num += 1
+
+            if test_result.passed:
+                tests_passed += 1
+
+            await ctx.send(test_result.display_result())
+
+    test_result_messages = [
+        f"```Testing Results: {tests_passed}/{test_num} passed in {display_time_delta(datetime.now() - start_time)}\n"
+    ]
+
+    for test_result in test_results:
+        message = test_result.display_result()
+        if len(test_result_messages[-1]) + len(message) > 1950:
+            test_result_messages[-1] += "```"
+            test_result_messages.append("```")
+
+        test_result_messages.append(f"\t{message}")
+
+        if test_result_messages[-1][-1] != "`":
+            test_result_messages[-1] += "```"
+
+    for message in test_result_messages:
+        await ctx.send(message)
