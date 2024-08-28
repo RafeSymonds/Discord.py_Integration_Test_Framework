@@ -1,5 +1,6 @@
 import asyncio
 import discord_interface
+import integration_test_framework.runner as runner
 
 
 async def main():
@@ -9,3 +10,7 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
+
+def on_message(message):
+    runner.process_bot_command(message)

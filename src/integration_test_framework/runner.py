@@ -1,6 +1,11 @@
 # TODO: update doc string
 """Frame work."""
 
+import sys
+
+sys.path.append("src/integration_test_framework")
+
+
 import pathlib
 import traceback
 from collections.abc import Callable
@@ -12,9 +17,7 @@ import discord_interface
 import integration_test_helpers
 from discord.ext import commands
 
-__test_info: integration_test_helpers.IntegrationTestInfo = (
-    integration_test_helpers.IntegrationTestInfo(None)
-)
+__test_info: integration_test_helpers.IntegrationTestInfo = integration_test_helpers.IntegrationTestInfo(None)
 
 
 async def __process_integration_test(
@@ -41,16 +44,12 @@ async def __process_integration_test(
     else:
         total_time = datetime.now() - start_time
 
-        return integration_test_helpers.IntegrationTestResult(
-            test_name, True, "", total_time
-        )
+        return integration_test_helpers.IntegrationTestResult(test_name, True, "", total_time)
 
 
 def test_setup(discord_user: discord.Member) -> None:
     """Run before every test."""
-    __test_info = integration_test_helpers.IntegrationTestInfo(
-        discord_user
-    )
+    __test_info = integration_test_helpers.IntegrationTestInfo(discord_user)
 
 
 async def run_integration_tests(
@@ -63,9 +62,7 @@ async def run_integration_tests(
     """Run all integration tests that contain test_filter."""
     test_setup(discord_user)
 
-    integration_test_files = [
-        item for item in integration_test_path.iterdir() if item.is_file()
-    ]
+    integration_test_files = [item for item in integration_test_path.iterdir() if item.is_file()]
 
     test_num = 1
     tests_passed = 0
@@ -128,9 +125,7 @@ async def process_bot_command(message: discord.Message) -> None:
     if message.author != discord_interface.client.user:
         return
 
-    if message.content.startswith(
-        f"{discord_interface.BOT_COMAMND_PREFIX}"
-    ):
+    if message.content.startswith(f"{discord_interface.BOT_COMAMND_PREFIX}"):
         return
 
     if __test_info.discord_user_overwrite is None:
