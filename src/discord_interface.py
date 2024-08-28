@@ -57,7 +57,7 @@ async def get_last_message_for_channel(channel_id) -> discord.Message | None:
     return None
 
 
-async def get_last_message_for_user(discord_id: int) -> discord.Mesage | None:
+async def get_last_message_for_user(discord_id: int) -> discord.Message | None:
     discord_user = await client.fetch_user(discord_id)
     channel = await discord_user.create_dm()
 
