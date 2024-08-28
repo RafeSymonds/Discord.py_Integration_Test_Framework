@@ -25,6 +25,9 @@ async def hello(ctx: commands.Context):
     await ctx.message.channel.send(f"Hello {ctx.message.author.mention}!")
 
 
+client.add_command(hello)
+
+
 async def send_message(msg: str, channel: discord.channel.TextChannel | discord.channel.DMChannel) -> None:
     await channel.send(msg)
 
