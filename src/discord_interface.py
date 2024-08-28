@@ -16,9 +16,13 @@ client = commands.Bot(intents=intents, command_prefix=BOT_COMAMND_PREFIX)
 
 @client.event
 async def on_message(message: discord.Message):
-    print("here")
     await runner.process_bot_command(message)
     await client.process_commands(message)
+
+
+@commands.command()
+async def hello(ctx: commands.Context):
+    await ctx.message.channel.send(f"Hello {ctx.message.author.mention}!")
 
 
 async def send_message(msg: str, channel: discord.channel.TextChannel | discord.channel.DMChannel) -> None:
