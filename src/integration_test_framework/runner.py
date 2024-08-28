@@ -1,31 +1,38 @@
-from typing import Callable
+"""Frame work."""
+
+import pathlib
+import traceback
+from collections.abc import Callable
+from datetime import datetime, timedelta
+from inspect import getmembers, isfunction
+
 import discord
 from discord.ext import commands
-import pathlib
-from inspect import getmembers, isfunction
-from datetime import datetime, timedelta
-import traceback
 
 
-def display_time_delta(time: timedelta) -> str:
+def __display_time_delta(time: timedelta) -> str:
     milliseconds = time.microseconds // 1000
     seconds = time.seconds % 60
     minutes = time.seconds // 60
 
-    formattedTime = ""
+    formatted_time = ""
 
     if minutes > 1:
-        formattedTime += f"{minutes} minutes "
+        formatted_time += f"{minutes} minutes "
     elif minutes == 1:
-        formattedTime += f"{minutes} minute "
-    formattedTime += f"{seconds}.{milliseconds} seconds"
+        formatted_time += f"{minutes} minute "
+    formatted_time += f"{seconds}.{milliseconds} seconds"
 
-    return formattedTime
+    return formatted_time
 
 
-class Integration_Test_Result:
+class __IntegrationTestResult:
     def __init__(
-        self, test_name: str, passed: bool, error: str, total_time: timedelta
+        self,
+        test_name: str,
+        passed: bool,
+        error: str,
+        total_time: timedelta,
     ) -> None:
         self.test_name = test_name
         self.passed = passed
@@ -34,16 +41,19 @@ class Integration_Test_Result:
 
     def display_result(self) -> str:
         if self.passed:
-            message = f"✅ {self.test_name} passed in {display_time_delta(self.total_time)}\n\n"
+            message = f"✅ {self.test_name} passed in {__display_time_delta(self.total_time)}\n\n"
         else:
-            message = f"❌ {self.test_name} failed in {display_time_delta(self.total_time)}\n{self.error}\n"
+            message = f"❌ {self.test_name} failed in {__display_time_delta(self.total_time)}\n{self.error}\n"
 
         return message
 
 
-async def process_integration_test(
-    test_name: str, test_function: Callable, ctx: commands.Context, test_num: int
-) -> Integration_Test_Result:
+async def __process_integration_test(
+    test_name: str,
+    test_function: Callable,
+    ctx: commands.Context,
+    test_num: int,
+) -> __IntegrationTestResult:
     await ctx.send(f"```Test {test_num}: {test_name}```")
 
     start_time = datetime.now()
@@ -53,7 +63,7 @@ async def process_integration_test(
     except Exception as e:
         total_time = datetime.now() - start_time
 
-        return Integration_Test_Result(
+        return __IntegrationTestResult(
             test_name,
             False,
             f"{e}, {type(e)}, {traceback.format_exc()}",
@@ -62,7 +72,12 @@ async def process_integration_test(
     else:
         total_time = datetime.now() - start_time
 
-        return Integration_Test_Result(test_name, True, "", total_time)
+        return __IntegrationTestResult(test_name, True, "", total_time)
+
+
+def test_setup(discord_user: discord.Member) -> None:
+    """Run before every test."""
+    __discord_user_overwritet = discord_user
 
 
 async def run_integration_tests(
@@ -70,10 +85,9 @@ async def run_integration_tests(
     discord_user: discord.Member,
     integration_test_path: pathlib.Path,
     test_filter: str = "",
-):
-    integration_test_files = [
-        item for item in integration_test_path.iterdir() if item.is_file()
-    ]
+) -> None:
+    """Runs all integration tests that contain test_filter."""
+    integration_test_files = [item for item in integration_test_path.iterdir() if item.is_file()]
 
     test_num = 1
     tests_passed = 0
@@ -92,7 +106,10 @@ async def run_integration_tests(
                 continue
 
             test_result = await process_integration_test(
-                function_name, function, ctx, test_num
+                function_name,
+                function,
+                ctx,
+                test_num,
             )
 
             test_results.append(test_results)
@@ -105,7 +122,7 @@ async def run_integration_tests(
             await ctx.send(test_result.display_result())
 
     test_result_messages = [
-        f"```Testing Results: {tests_passed}/{test_num} passed in {display_time_delta(datetime.now() - start_time)}\n"
+        f"```Testing Results: {tests_passed}/{test_num} passed in {__display_time_delta(datetime.now() - start_time)}\n",
     ]
 
     for test_result in test_results:
