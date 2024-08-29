@@ -22,6 +22,12 @@ from discord.ext import commands
 __test_info: integration_test_helpers.IntegrationTestInfo = integration_test_helpers.IntegrationTestInfo(None)
 
 
+async def run_command(ctx: commands.Context, command_name: str) -> discord.Message:
+    message = await ctx.send(command_name)
+    await process_bot_command(message)
+    return message
+
+
 async def __process_integration_test(
     test_name: str,
     test_function: Callable,
@@ -98,16 +104,15 @@ async def run_integration_tests(
             await ctx.send(f"```{test_result.display_result()}```")
 
     test_result_messages = [
-        f"```Testing Results: {tests_passed}/{test_num} passed in {integration_test_helpers.__display_time_delta(datetime.now() - start_time)}\n```",
+        f"```Testing Results: {tests_passed}/{test_num} passed in {integration_test_helpers.display_time_delta(datetime.now() - start_time)}\n```",
     ]
-    # test_result_messages = [f"```Testing Results: {tests_passed}/{test_num} passed in 69 seconds\n"]
     for test_result in test_results:
         message = test_result.display_result()
         if len(test_result_messages[-1]) + len(message) > 1950:
             test_result_messages[-1] += "```"
             test_result_messages.append("```")
 
-        test_result_messages.append(f"```\t{message}")
+        test_result_messages[-1] += f"```\t{message}"
 
         if test_result_messages[-1][-1] != "`":
             test_result_messages[-1] += "```"
