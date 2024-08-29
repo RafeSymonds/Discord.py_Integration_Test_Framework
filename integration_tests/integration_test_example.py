@@ -7,9 +7,6 @@ import integration_test_framework.runner as runner
 
 from discord.ext import commands
 
-TEST_CHANNEL_ID = 1234567890
-TEST_CHANNEL = discord_interface.client.get_channel(TEST_CHANNEL_ID)
-
 
 async def test_most_recent_message(ctx: commands.Context):
     """TODO: Add docstring."""
@@ -21,4 +18,9 @@ async def test_most_recent_message(ctx: commands.Context):
 
 async def test_most_recent_dm(ctx: commands.Context):
     """TODO: Add docstring."""
-    await runner.process_bot_command()
+    message = await ctx.send("!dm_hello")
+    await runner.process_bot_command(message)
+    discord_id = ctx.message.author.id
+    last_dm = await discord_interface.get_last_message_for_user(discord_id)
+    last_message = await discord_interface.wait_for_new_message_in_DM(last_dm, discord_id)
+    assert last_message.content == f"Hello in DM {ctx.message.author.mention}!"
