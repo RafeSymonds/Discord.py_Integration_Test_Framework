@@ -27,16 +27,27 @@ async def on_message(message: discord.Message):
 
 @commands.command()
 async def hello(ctx: commands.Context):
+    """TODO: Add docstring."""
     await ctx.message.channel.send(f"Hello {ctx.message.author.mention}!")
 
 
 @commands.command()
 async def run_tests(ctx: commands.Context):
+    """TODO: Add docstring."""
     await runner.run_integration_tests(ctx, ctx.message.author, pathlib.Path("integration_tests"))
+
+
+@commands.command()
+async def dm_hello(ctx: commands.Context):
+    """TODO: Add docstring."""
+    user = ctx.message.author
+    channel = await user.create_dm()
+    await channel.send(f"Hello in DM {user.mention}!")
 
 
 client.add_command(hello)
 client.add_command(run_tests)
+client.add_command(dm_hello)
 
 
 async def send_message(msg: str, channel: discord.channel.TextChannel | discord.channel.DMChannel) -> None:

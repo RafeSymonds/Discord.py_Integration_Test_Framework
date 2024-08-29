@@ -19,22 +19,6 @@ def display_time_delta(time: timedelta) -> str:
     return formatted_time
 
 
-def __display_time_delta(time: timedelta) -> str:
-    milliseconds = time.microseconds // 1000
-    seconds = time.seconds % 60
-    minutes = time.seconds // 60
-
-    formatted_time = ""
-
-    if minutes > 1:
-        formatted_time += f"{minutes} minutes "
-    elif minutes == 1:
-        formatted_time += f"{minutes} minute "
-    formatted_time += f"{seconds}.{milliseconds} seconds"
-
-    return formatted_time
-
-
 class IntegrationTestResult:
     """Testing result information."""
 
